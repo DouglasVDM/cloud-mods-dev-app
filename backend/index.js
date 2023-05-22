@@ -14,7 +14,7 @@ app.use(express.json());
 // ROUTES
 
 // create a departments
-app.post("/departments", async (req, res) => {
+app.post("/api/v1/departments", async (req, res) => {
     try {
         const { description } = (req.body);
         const newDepartment = await pool.query("INSERT INTO departments (description) VALUES($1) RETURNING *", [description]
@@ -28,7 +28,7 @@ app.post("/departments", async (req, res) => {
 });
 
 // welcome message
-app.get("/", async (req, res) => {
+app.get("/api/v1", async (req, res) => {
     try {
         res.send("From API Server: Hello World")
 
@@ -39,7 +39,7 @@ app.get("/", async (req, res) => {
 
 
 // get all departments
-app.get("/departments", async (req, res) => {
+app.get("/api/v1/departments", async (req, res) => {
     try {
         const allDepartments = await pool.query("SELECT * FROM departments");
         res.json(allDepartments.rows)
@@ -50,7 +50,7 @@ app.get("/departments", async (req, res) => {
 })
 
 // get a departments by id
-app.get("/departments/:id", async (req, res) => {
+app.get("/api/v1/departments/:id", async (req, res) => {
     const { id } = req.params;
     try {
         const departments = await pool.query("SELECT * FROM departments WHERE department_id = $1", [id]);
@@ -62,7 +62,7 @@ app.get("/departments/:id", async (req, res) => {
 })
 
 // update a departments
-app.put("/departments/:id", async (req, res) => {
+app.put("/api/v1/departments/:id", async (req, res) => {
     const { id } = req.params;
     const { description } = (req.body);
     try {
@@ -75,7 +75,7 @@ app.put("/departments/:id", async (req, res) => {
 });
 
 // delete a departments
-app.delete("/departments/:id", async (req, res) => {
+app.delete("/api/v1/departments/:id", async (req, res) => {
     const { id } = req.params;
     try {
         const deleteDepartment = await pool.query("DELETE FROM departments WHERE department_id = $1", [id]);
