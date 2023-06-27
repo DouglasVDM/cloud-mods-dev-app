@@ -1,19 +1,30 @@
-# Fetching the latest node image on alpine linux
-FROM node:alpine AS development
+# Use an official Node.js runtime as the base image for building the app
+FROM node:14-alpine AS build
 
-# Declaring env
-ENV NODE_ENV development
-
-# Setting up the work directory
+# Set the working directory in the container
 WORKDIR /app
 
-# Installing dependencies
-COPY ./package*.json /app
+# Copy the package.json and package-lock.json files to the container
+COPY package*.json ./
 
-RUN npm install
+# Install the app dependencies
+RUN npm ci
 
-# Copying all the files in our project
+# Copy the app files to the container
 COPY . .
 
-# Starting our application
-CMD npm start
+# Build the React app
+RUN npm run build
+
+# Use a lightweight Nginx image to serve the built app
+FROM nginx:alpine
+
+# Copy the built app from the previous build stage to the Nginx web root directory
+COPY --from=build /app/build /usr/share/nginx/html
+
+# Expose the desired port (e.g., 80) for the Nginx server
+EXPOSE 80
+
+# Start Nginx when the Docker container launches
+CMD ["nginx", "-g", "daemon off;"]
+
